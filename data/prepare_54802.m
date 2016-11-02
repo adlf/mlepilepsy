@@ -114,16 +114,8 @@ end
 
 train_54802 = equip
 
-train_54802_T = train_54802.Trg;
-test_54802_T = test_54802.Trg;
-
-train_54802_Feat = train_54802.FeatVectSel;
-test_54802_Feat = test_54802.FeatVectSel;
-
-save('train_54802_T', 'train_54802_T');
-save('test_54802_T', 'test_54802_T');
-
-save('train_54802_Feat', 'train_54802_Feat');
-save('test_54802_Feat', 'test_54802_Feat');
+save('train_54802', 'train_54802')
+save('test_54802', 'test_54802')
+    
     
     
