@@ -114,8 +114,32 @@ end
 
 train_54802 = equip
 
-save('train_54802', 'train_54802')
-save('test_54802', 'test_54802')
+train_54802_trg = train_54802.Trg;
+train_54802_trg_interictal = train_54802.Trg(1,:);
+train_54802_trg_preictal = train_54802.Trg(2,:);
+train_54802_trg_ictal = train_54802.Trg(3,:);
+train_54802_trg_posictal = train_54802.Trg(4,:);
+train_54802_input = train_54802.FeatVectSel;
+
+test_54802_trg = test_54802.Trg;
+test_54802_trg_interictal = test_54802.Trg(1,:);
+test_54802_trg_preictal = test_54802.Trg(2,:);
+test_54802_trg_ictal = test_54802.Trg(3,:);
+test_54802_trg_posictal = test_54802.Trg(4,:);
+test_54802_input = test_54802.FeatVectSel;
+
+save('train_54802_input', 'train_54802_input');
+save('test_54802_input', 'test_54802_input');
+
+save('train_54802_trg_interictal', 'train_54802_trg_interictal');
+save('train_54802_trg_preictal', 'train_54802_trg_preictal');
+save('train_54802_trg_ictal', 'train_54802_trg_ictal');
+save('train_54802_trg_posictal', 'train_54802_trg_posictal');
+
+save('test_54802_trg_interictal', 'test_54802_trg_interictal');
+save('test_54802_trg_preictal', 'test_54802_trg_preictal');
+save('test_54802_trg_ictal', 'test_54802_trg_ictal');
+save('test_54802_trg_posictal', 'test_54802_trg_posictal');
     
     
     

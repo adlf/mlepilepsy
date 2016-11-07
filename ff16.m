@@ -19,6 +19,7 @@ classdef ff16 < handle
         
         function [se, sp, f] = test(obj, input, target)
             y = obj.Net(input);
+            y = round(y);
             [se, sp, f] = calculate_performance(y, target);
         end
         

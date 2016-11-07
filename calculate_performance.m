@@ -5,9 +5,12 @@ function [ sensitivity, specificity, F] = calculate_performance( input, target )
     false_positives = 0;
     false_negatives = 0;
     
+    
     for i = 1:length(input)
+        
         inp = input(i);
         trg = target(i);
+        
         
         if inp == trg && trg == 1
             true_positives = true_positives + 1;
@@ -26,11 +29,6 @@ function [ sensitivity, specificity, F] = calculate_performance( input, target )
         end
     end
 
-    true_positives
-    true_negatives
-    false_positives
-    false_negatives
-    
     % Sensitivity, the true positive rate, the recall, or probability of detection
     sensitivity = true_positives / (true_positives + false_negatives);
     
