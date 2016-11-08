@@ -1,180 +1,217 @@
-% GUI goals:
-% 1. Select one network from the network list
-%    - All networks are trained with preictal or ictal
-%    data of 54802 and 112502
-% 2. Clear weights and / or train more
-% 3. Test network with selected data
-% 4. Show test results
+% GUI TODO:
+% Clear network weights
+% Show:
+%    Found right seizures (green)
+%    Found false seizures (blue)
+%    Not found seizures   (red)
 
 function gui
     close all
     
     network_object = [];
-    nn_list = [];
-    train_data_list = [];
-    test_data_list = [];
-    
-    train_112502 = [];
-    train_54802 = [];
-    test_112502 = [];
-    test_54802 = [];
-        
-    load('nn_list.mat')
-    load('train_data_list.mat');
-    load('test_data_list.mat');
+    training_target_data = [];
+    training_input_data = [];
+    test_target_data = [];
+    test_input_data = [];
     
     % Create the GUI window
     f = figure('Visible','off', 'Resize','off', 'Position',[0,0,600,400]); f.Name = 'Prediction and detection of epileptic seizures';
     movegui(f, 'northwest')
-    f.Visible = 'on';
 
     % Create GUI items
     left_panel = uipanel('Title','Neural network settings','FontSize',16,'Position',[0.02 0.02 0.45 0.96]);
 
-    select_nn_text = uicontrol(left_panel,'Style','text','String','1. Select the network:','Position',[10,320,200,25],'HorizontalAlignment','left');  
-    select_nn_architecture = uicontrol(left_panel, 'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'Position',[10,300,200,25],'HorizontalAlignment','left','Callback',@select_nn_architecture_callback);
-        
-    select_train_data_text = uicontrol(left_panel, 'Style','text','String','Select training data:','Position',[10,220,200,25],'HorizontalAlignment','left');  
-    select_train_data = uicontrol(left_panel, 'Style','popupmenu', 'String',{'', 'NN1','NN2','NN3'},'Position',[10,200,200,25],'HorizontalAlignment','left','Callback',@select_train_data_callback);
+    select_network_text       = uicontrol(left_panel,'Position',[10,320,200,25],'Style','text','String','Select the network:','HorizontalAlignment','left');  
+    select_network            = uicontrol(left_panel,'Position',[10,300,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_network_callback);
     
-    select_test_data_text = uicontrol(left_panel, 'Style','text','String','3. Select test data','Position',[10,170,200,25],'HorizontalAlignment','left');  
-    select_test_data = uicontrol(left_panel, 'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'Position',[10,150,200,25],'HorizontalAlignment','left','Callback',@select_test_data_callback);
-        
-    train_nn_button = uicontrol(left_panel, 'Style','pushbutton','String','Train network','Position',[90,60,75,25],'Callback',@train_nn_button_callback);
-    test_network_button = uicontrol(left_panel, 'Style','pushbutton','String','Test network','Position',[170,60,75,25],'Callback',@test_network_button_callback);
-    error_text = uicontrol(left_panel, 'ForegroundColor', 'red', 'Style','text','String','','Position',[10,30,200,25],'HorizontalAlignment','left');
+    network_name_text         = uicontrol(left_panel,'Position',[10,280,200,25],'Style','text','String','Name: Network lalalaa','HorizontalAlignment','left');  
+    
+    select_training_data_text = uicontrol(left_panel,'Position',[10,250,200,25],'Style','text','String','Select training data:','HorizontalAlignment','left');  
+    select_training_data      = uicontrol(left_panel,'Position',[10,230,200,25],'Style','popupmenu', 'String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_training_data_callback);
+    train_network_button      = uicontrol(left_panel,'Position',[10,210,75,25],'Style','pushbutton','String','Train network','Callback',@train_network_button_callback);
 
-    set_visibilities();
-    get_nn_architectures();
-    get_train_data_list();
+    select_test_data_text     = uicontrol(left_panel,'Position',[10,170,200,25],'Style','text','String','Select test data','HorizontalAlignment','left');  
+    select_test_data          = uicontrol(left_panel,'Position',[10,150,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_test_data_callback);
+    test_network_button       = uicontrol(left_panel,'Position',[10,130,75,25],'Style','pushbutton','String','Test network','Callback',@test_network_button_callback);
+       
+    error_text                = uicontrol(left_panel,'Position',[10,10,200,100],'BackgroundColor', 'white','ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
+
+    right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.96]);
+    specificity_text  = uicontrol(right_panel,'Position',[10,320,200,25],'Style','text','String','Specificity:','HorizontalAlignment','left');  
+    specificity_value = uicontrol(right_panel,'Position',[70,320,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    sensitivity_text  = uicontrol(right_panel,'Position',[10,300,200,25],'Style','text','String','Sensitivity:','HorizontalAlignment','left');  
+    sensitivity_value = uicontrol(right_panel,'Position',[70,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    f_text            = uicontrol(right_panel,'Position',[10,280,200,25],'Style','text','String','F-value:','HorizontalAlignment','left');  
+    f_value           = uicontrol(right_panel,'Position',[70,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    
+    t_p_text          = uicontrol(right_panel,'Position',[130,320,200,25],'Style','text','String','True positives:','HorizontalAlignment','left');  
+    t_p_value         = uicontrol(right_panel,'Position',[220,320,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    
+    t_n_text          = uicontrol(right_panel,'Position',[130,300,200,25],'Style','text','String','True negatives:','HorizontalAlignment','left');  
+    t_n_value         = uicontrol(right_panel,'Position',[220,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    
+    f_p_text          = uicontrol(right_panel,'Position',[130,280,200,25],'Style','text','String','False positives:','HorizontalAlignment','left');  
+    f_p_value         = uicontrol(right_panel,'Position',[220,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    
+    f_n_text          = uicontrol(right_panel,'Position',[130,260,200,25],'Style','text','String','False negatives:','HorizontalAlignment','left');  
+    f_n_value         = uicontrol(right_panel,'Position',[220,260,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    
+    result_text       = uicontrol(right_panel,'Position',[10,230,200,35],'Style','text','String','Green: True positive, Blue: Not found, Red: False positive','HorizontalAlignment','left');  
+    result_plot            = axes(right_panel, 'Units','Pixels','Position',[20,20,230,200],'YLim',[-0.2 1.2]); 
+
+    
+    f.Visible = 'on';
+
+    get_network_list();
+    get_training_data_list();
     get_test_data_list();
     
+    select_network_callback(select_network);
+    select_training_data_callback(select_training_data);
+    select_test_data_callback(select_test_data);
+    
 %%%% GUI CALLBACKS %%%%
-    function select_nn_architecture_callback(source,eventdata) 
-        selected = source.String{source.Value}
-        if ~strcmp(selected, '')
-           get_trained_nns();
+    function select_network_callback(source,eventdata)
+        disp('Select network');
+        try
+            filename = source.String{source.Value};
+            network_name = strsplit(filename, '.');
+            network_name = char(network_name(1));
+            path = strcat(['networks/' filename]);
+            loaded = load(path);
+            network_object = loaded.(network_name);
+            network_name_text.String = ['Name: ' char(network_object.name)];
+        catch ME
+            error_text.String = getReport(ME);
         end
-        set_visibilities();    
     end
 
-    function select_train_data_callback(source,eventdata) 
-        selected = source.String{source.Value}
-        
-        if ~strcmp(selected, '')           
-           % TODO calculate next step choices
+    function select_training_data_callback(source,eventdata)
+        disp('Select training data');
+        try
+            filename = source.String{source.Value};
+            data_name = strsplit(filename, '.');
+            data_name = char(data_name(1));
+            path = strcat(['data/' filename]);
+            loaded = load(path);
+            training_target_data = loaded.(data_name);
+
+            input_data_name = strsplit(data_name, 'trg');
+            input_data_name = strcat([char(input_data_name(1)) 'input']);
+            input_data_path = strcat(['data/' input_data_name '.mat']);
+            loaded = load(input_data_path);
+            training_input_data = loaded.(input_data_name);
+        catch ME
+            error_text.String = getReport(ME)
         end
-        set_visibilities();
     end
 
-    function select_test_data_callback(source,eventdata) 
-        selected = source.String{source.Value}
-        set_visibilities();
+    function select_test_data_callback(source,eventdata)
+        disp('Select test data');
+        try
+            filename = source.String{source.Value};
+            data_name = strsplit(filename, '.');
+            data_name = char(data_name(1));
+            path = strcat(['data/' filename]);
+            loaded = load(path);
+            test_target_data = loaded.(data_name);
+
+            input_data_name = strsplit(data_name, 'trg');
+            input_data_name = strcat([char(input_data_name(1)) 'input']);
+            input_data_path = strcat(['data/' input_data_name '.mat']);
+            loaded = load(input_data_path);
+            test_input_data = loaded.(input_data_name);
+        catch ME
+            error_text.String = getReport(ME)
+        end
     end
 
-    function select_seizure_stage_callback(source,eventdata) 
-        selected = source.String{source.Value}
-        set_visibilities();
-    end
 
-    function clear_settings_button_callback(source,eventdata) 
-       select_nn_architecture.Value = 1;
-       select_train_data.Value = 1;
-       select_test_data.Value = 1;
-       select_seizure_stage.Value = 1;
-       error_text.String = '';
-       set_visibilities();
-    end
-
-%%%% OTHER GUI RELATED FUNCTIONS %%%%
+%%%% OTHER FUNCTIONS %%%%
    
-    function get_train_data_list()
-        select_train_data.String = [{''} train_data_list];
+    function get_training_data_list()
+        disp('Get training data list');
+        try
+            names = {};
+            list = dir(fullfile('data/', 'train*trg*.mat'));
+            file_count   = length(list);
+            for k = 1:file_count
+                file = list(k).name;
+                names{k} = file;
+            end
+            select_training_data.String = names;
+        catch ME
+            error_text.String = getReport(ME);
+        end
     end
     
     function get_test_data_list()
-        select_test_data.String = [{''} test_data_list];
-    end
-
-    function get_nn_architectures()
-        list = {' '};
-        names = transpose(fieldnames(nn_list));
-        list = [list, names];
-        select_nn_architecture.String = list;
-    end
-
-    function get_trained_nns()
-        selected_nn = select_nn_architecture.String{select_nn_architecture.Value};
-        list = {' '};
-        networks = nn_list.(selected_nn).networks;
-        
-        if ~isempty(networks)
-            names = transpose(fieldnames(networks))
-            list = [list, names]
+        disp('Get test data list');
+        try
+            names = {};
+            list = dir(fullfile('data/', 'test*trg*.mat'));
+            file_count   = length(list);
+            for k = 1:file_count
+                file = list(k).name;
+                names{k} = file;
+            end
+            select_test_data.String = names;
+        catch ME
+            error_text.String = getReport(ME);
         end
-        
-        set_visibilities()
     end
 
-    function set_visibilities()
-        % TODO Write visibility settings
-
-        %select_train_data.Enable = 'off';
-        %train_nn_button.Enable = 'off';
-        %test_network_button.Enable = 'off';
-        %select_seizure_stage.Enable = 'off';
-        %select_test_data.Enable = 'off';
-        
-        nn_arch = select_nn_architecture.Value;
-        training_data = select_train_data.Value;
-        test_data = select_test_data.Value;
-
-        
+    function get_network_list()
+        disp('Get network list');
+        try
+            names = {};
+            list = dir(fullfile('networks/', '*.mat'));
+            file_count   = length(list);
+            for k = 1:file_count
+                file = list(k).name;
+                names{k} = file;
+            end
+            select_network.String = names;
+        catch ME
+            error_text.String = getReport(ME);
+        end
     end
+
 
 %%%% NEURAL NETWORK FUNCTIONS %%%%
 
-    function train_nn_button_callback(source,eventdata)        
-        error_message = '';
-        if select_nn_architecture.Value == 1
-            error_message = 'Select the architecture';
-        elseif select_train_data.Value == 1
-            error_message = 'Select training data';
-        elseif select_seizure_stage.Value == 1
-            error_message = 'Select used seizure state';
+    function train_network_button_callback(source,eventdata)        
+        disp('Train network');
+        try
+            network_object = train(network_object, training_input_data, training_target_data);
+        catch ME
+            error_text.String = getReport(ME)
         end
-        
-        if ~strcmp(error_message, '')
-            disp(error_message);
-            error_text.String = error_message;
-            return
-        end
-        
-        seizure_stage = select_seizure_stage.Value - 1;
-        architecture_name = select_nn_architecture.String{select_nn_architecture.Value}
-        network_class_handle = nn_list.(architecture_name).handle
-        network_object = network_class_handle()
-        training_data_name = select_train_data.String{select_train_data.Value}
-        training_data = eval(training_data_name);
-        network_object.train(training_data.FeatVectSel, training_data.Trg(seizure_stage,:))
+        disp('Network trained');
     end
 
-    function test_network_button_callback(source,eventdata) 
-
-        error_message = '';
-        if ~isobject(network_object)
-            error_message = 'Neural network not found'; 
+    function test_network_button_callback(source,eventdata)
+        disp('Test network');
+        try
+            result = round(network_object(test_input_data));
+            [se, sp, f, t_p, t_n, f_p, f_n, fts, ffs, nfs] = calculate_performance(result, test_target_data);
+            specificity_value.String = sp;
+            sensitivity_value.String = se;
+            f_value.String = f;
+            t_p_value.String = t_p;
+            t_n_value.String = t_n;
+            f_p_value.String = f_p;
+            f_n_value.String = f_n;
+            cla
+            hold on
+            plot(fts,'g')
+            plot(ffs,'r')
+            plot(nfs,'b')
+        catch ME
+            error_text.String = getReport(ME)
         end
-        
-        if ~strcmp(error_message, '')
-            disp(error_message);
-            error_text.String = error_message;
-            return
-        end
-        
-        seizure_stage = select_seizure_stage.Value - 1;
-        test_data_name = select_test_data.String{select_test_data.Value}
-        test_data = eval(test_data_name);
-        [se, sp, f] = network_object.test(test_data.FeatVectSel, test_data.Trg(seizure_stage,:))
+        disp('Network tested');
     end
+
+
 end 
