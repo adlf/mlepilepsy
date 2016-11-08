@@ -82,7 +82,7 @@ function gui
             network_object = loaded.(network_name);
             network_name_text.String = ['Name: ' char(network_object.name)];
         catch ME
-            error_text.String = getReport(ME);
+            print_error(ME);
         end
     end
 
@@ -102,7 +102,7 @@ function gui
             loaded = load(input_data_path);
             training_input_data = loaded.(input_data_name);
         catch ME
-            error_text.String = getReport(ME)
+            print_error(ME);
         end
     end
 
@@ -122,7 +122,7 @@ function gui
             loaded = load(input_data_path);
             test_input_data = loaded.(input_data_name);
         catch ME
-            error_text.String = getReport(ME)
+            print_error(ME);
         end
     end
 
@@ -141,7 +141,7 @@ function gui
             end
             select_training_data.String = names;
         catch ME
-            error_text.String = getReport(ME);
+            print_error(ME);
         end
     end
     
@@ -157,7 +157,7 @@ function gui
             end
             select_test_data.String = names;
         catch ME
-            error_text.String = getReport(ME);
+            print_error(ME);
         end
     end
 
@@ -173,10 +173,14 @@ function gui
             end
             select_network.String = names;
         catch ME
-            error_text.String = getReport(ME);
+            print_error(ME);
         end
     end
 
+    function print_error(exception)
+        disp(exception);
+        error_text.String = getReport(exception);
+    end
 
 %%%% NEURAL NETWORK FUNCTIONS %%%%
 
@@ -192,6 +196,7 @@ function gui
 
     function test_network_button_callback(source,eventdata)
         disp('Test network');
+        
         try
             result = round(network_object(test_input_data));
             [se, sp, f, t_p, t_n, f_p, f_n, fts, ffs, nfs] = calculate_performance(result, test_target_data);
@@ -208,7 +213,7 @@ function gui
             plot(ffs,'r')
             plot(nfs,'b')
         catch ME
-            error_text.String = getReport(ME)
+            print_error(ME);
         end
         disp('Network tested');
     end
