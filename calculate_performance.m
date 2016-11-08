@@ -53,7 +53,6 @@ function [ sensitivity, specificity, F, true_positives, true_negatives, false_po
         else
             if one_count > 0 && one_count < 10
                 for k = (i-one_count):i
-                    simplified(k)
                     simplified(k) = 0;
                 end
             end

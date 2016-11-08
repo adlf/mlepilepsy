@@ -1,9 +1,9 @@
 % GUI TODO:
 % Clear network weights
-% Show:
-%    Found right seizures (green)
-%    Found false seizures (blue)
-%    Not found seizures   (red)
+
+% View network
+% Save network
+% Create new network
 
 function gui
     close all
@@ -34,30 +34,31 @@ function gui
     select_test_data          = uicontrol(left_panel,'Position',[10,150,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_test_data_callback);
     test_network_button       = uicontrol(left_panel,'Position',[10,130,75,25],'Style','pushbutton','String','Test network','Callback',@test_network_button_callback);
        
-    error_text                = uicontrol(left_panel,'Position',[10,10,200,100],'BackgroundColor', 'white','ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
+    error_text                = uicontrol(left_panel,'Position',[10,10,200,100],'ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
 
     right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.96]);
-    specificity_text  = uicontrol(right_panel,'Position',[10,320,200,25],'Style','text','String','Specificity:','HorizontalAlignment','left');  
-    specificity_value = uicontrol(right_panel,'Position',[70,320,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    sensitivity_text  = uicontrol(right_panel,'Position',[10,300,200,25],'Style','text','String','Sensitivity:','HorizontalAlignment','left');  
-    sensitivity_value = uicontrol(right_panel,'Position',[70,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    f_text            = uicontrol(right_panel,'Position',[10,280,200,25],'Style','text','String','F-value:','HorizontalAlignment','left');  
-    f_value           = uicontrol(right_panel,'Position',[70,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
     
-    t_p_text          = uicontrol(right_panel,'Position',[130,320,200,25],'Style','text','String','True positives:','HorizontalAlignment','left');  
-    t_p_value         = uicontrol(right_panel,'Position',[220,320,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    specificity_text  = uicontrol(right_panel,'Position',[10,300,200,25],'Style','text','String','Specificity:','HorizontalAlignment','left');  
+    specificity_value = uicontrol(right_panel,'Position',[70,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    sensitivity_text  = uicontrol(right_panel,'Position',[10,280,200,25],'Style','text','String','Sensitivity:','HorizontalAlignment','left');  
+    sensitivity_value = uicontrol(right_panel,'Position',[70,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    f_text            = uicontrol(right_panel,'Position',[10,260,200,25],'Style','text','String','F-value:','HorizontalAlignment','left');  
+    f_value           = uicontrol(right_panel,'Position',[70,260,200,25],'Style','text','String','','HorizontalAlignment','left');  
     
-    t_n_text          = uicontrol(right_panel,'Position',[130,300,200,25],'Style','text','String','True negatives:','HorizontalAlignment','left');  
-    t_n_value         = uicontrol(right_panel,'Position',[220,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    t_p_text          = uicontrol(right_panel,'Position',[130,300,200,25],'Style','text','String','True positives:','HorizontalAlignment','left');  
+    t_p_value         = uicontrol(right_panel,'Position',[220,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
     
-    f_p_text          = uicontrol(right_panel,'Position',[130,280,200,25],'Style','text','String','False positives:','HorizontalAlignment','left');  
-    f_p_value         = uicontrol(right_panel,'Position',[220,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    t_n_text          = uicontrol(right_panel,'Position',[130,280,200,25],'Style','text','String','True negatives:','HorizontalAlignment','left');  
+    t_n_value         = uicontrol(right_panel,'Position',[220,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
     
-    f_n_text          = uicontrol(right_panel,'Position',[130,260,200,25],'Style','text','String','False negatives:','HorizontalAlignment','left');  
-    f_n_value         = uicontrol(right_panel,'Position',[220,260,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    f_p_text          = uicontrol(right_panel,'Position',[130,260,200,25],'Style','text','String','False positives:','HorizontalAlignment','left');  
+    f_p_value         = uicontrol(right_panel,'Position',[220,260,200,25],'Style','text','String','','HorizontalAlignment','left');  
     
-    result_text       = uicontrol(right_panel,'Position',[10,230,200,35],'Style','text','String','Green: True positive, Blue: Not found, Red: False positive','HorizontalAlignment','left');  
-    result_plot            = axes(right_panel, 'Units','Pixels','Position',[20,20,230,200],'YLim',[-0.2 1.2]); 
+    f_n_text          = uicontrol(right_panel,'Position',[130,240,200,25],'Style','text','String','False negatives:','HorizontalAlignment','left');  
+    f_n_value         = uicontrol(right_panel,'Position',[220,240,200,25],'Style','text','String','','HorizontalAlignment','left');  
+    
+    result_text       = uicontrol(right_panel,'Position',[10,200,200,35],'Style','text','String','Green: True positive, Blue: Not found, Red: False positive','HorizontalAlignment','left');  
+    result_plot            = axes(right_panel, 'Units','Pixels','Position',[20,20,230,50],'YLim',[-0.2 1.2]); 
 
     
     f.Visible = 'on';
@@ -125,7 +126,6 @@ function gui
             print_error(ME);
         end
     end
-
 
 %%%% OTHER FUNCTIONS %%%%
    
@@ -209,9 +209,9 @@ function gui
             f_n_value.String = f_n;
             cla
             hold on
-            plot(fts,'g')
-            plot(ffs,'r')
-            plot(nfs,'b')
+            plot(fts,'g');
+            plot(ffs,'r');
+            plot(nfs,'b');
         catch ME
             print_error(ME);
         end
