@@ -1,0 +1,27 @@
+1. import used data from data folder by double-clicking.
+If you don't know what to select, you can import them all.
+test_* files are for testing and train_* files are for training.
+Data files are created by prepare_* functions
+
+2. Run nntool
+
+3. Click Import
+
+4. Select variable from the list and import it as input or target data.
+*_input files are for input and *trg* files are for target.
+You have to input at least one as a target and one as an input
+
+5. Close the Import window
+
+6. Create a network by clicking "New..."
+
+7. Select the network type and other options and create the network
+
+8. Close the "Create network" window
+
+9. Click "Export" to export your network. Select it from the list and click "Save".
+Save the network to the "networks" folder. The filename must be same than the name of the network.
+For example, network "feedforw10" must be saved as "feedforw10.mat"
+
+10. Run the gui used for this assignment, select the network, train it and test it
+

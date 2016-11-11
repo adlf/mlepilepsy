@@ -1,9 +1,6 @@
 % GUI TODO:
 % Clear network weights
-
-% View network
-% Save network
-% Create new network
+% Edit activation function and training function
 
 function gui
     close all
@@ -15,22 +12,14 @@ function gui
     test_input_data = [];
     
     % Create the GUI window
-    f = figure('Visible','off', 'Resize','off', 'Position',[0,0,600,600]); f.Name = 'Prediction and detection of epileptic seizures';
+    f = figure('Visible','off', 'Resize','off', 'Position',[0,0,600,400]); f.Name = 'Prediction and detection of epileptic seizures';
     movegui(f, 'northwest')
 
     % Create GUI item
     
-    top_panel = uipanel('Title','Create a neural network','FontSize',16,'Position',[0.02 0.64 0.96 0.35]);
-    left_panel = uipanel('Title','Testing and training','FontSize',16,'Position',[0.02 0.02 0.45 0.61]);
-    right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.61]);
-
-    %select_network_type_text   = uicontrol(top_panel,'Position',[10,150,200,25],'Style','text','String','Select the network architecture','HorizontalAlignment','left');  
-    %select_network_type        = uicontrol(top_panel,'Position',[10,130,200,25],'Style','popupmenu','String',{'Feed-forward','Narx','something'},'HorizontalAlignment','left','Callback',@select_network_callback);
+    left_panel = uipanel('Title','Testing and training','FontSize',16,'Position',[0.02 0.02 0.45 0.95]);
+    right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.95]);
     
-   
-    
-    
-
     select_network_text       = uicontrol(left_panel,'Position',[10,320,200,25],'Style','text','String','Select the network:','HorizontalAlignment','left');  
     select_network            = uicontrol(left_panel,'Position',[10,300,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_network_callback);
     network_name_text         = uicontrol(left_panel,'Position',[10,280,200,25],'Style','text','String','Name: Network lalalaa','HorizontalAlignment','left');  
@@ -41,6 +30,7 @@ function gui
     select_test_data          = uicontrol(left_panel,'Position',[10,150,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_test_data_callback);
     test_network_button       = uicontrol(left_panel,'Position',[10,130,75,25],'Style','pushbutton','String','Test network','Callback',@test_network_button_callback);
     save_network_button       = uicontrol(left_panel,'Position',[10,90,75,25],'Style','pushbutton','String','Save network','Callback',@save_network_button_callback);
+    create_network_button     = uicontrol(left_panel,'Position',[100,90,75,25],'Style','pushbutton','String','Create network','Callback',@create_network_button_callback);
     error_text                = uicontrol(left_panel,'Position',[10,10,200,80],'ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
 
     specificity_text  = uicontrol(right_panel,'Position',[10,300,200,25],'Style','text','String','Specificity:','HorizontalAlignment','left');  
@@ -89,6 +79,8 @@ function gui
 
     function select_training_data_callback(source,eventdata)
         disp('Select training data');
+        disp(source.String);
+        disp(source.Value);
         try
             filename = source.String{source.Value};
             data_name = strsplit(filename, '.');
@@ -217,8 +209,19 @@ function gui
         disp('Network tested');
     end
 
+    function create_network_button_callback(source,eventdata)
+        [net, name] = create_network();
+        network_object = net;
+        object_to_save.(name) = network_object;
+        save(strcat(['networks/' name]), '-struct', 'object_to_save')
+        get_network_list();
+        index = find(strcmp(select_network.String, strcat([name '.mat'])))
+        select_network.Value = index;
+    end
+
     function save_network_button_callback(source,eventdata)
         disp('Save the network data');
+        
         old_filename = select_network.String{select_network.Value};
         old_network_name = strsplit(old_filename, '.');
         old_network_name = char(old_network_name(1));
@@ -226,8 +229,7 @@ function gui
         prompt = {'Enter new file name:'};
         dlg_title = 'Input';
         num_lines = 1;
-        defaultans = {old_network_name};
-        new_name = inputdlg(prompt,dlg_title,num_lines,defaultans)
+        new_name = inputdlg(prompt,dlg_title,num_lines)
         
         if isempty(new_name)
             return;
