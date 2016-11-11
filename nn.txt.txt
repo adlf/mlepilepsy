@@ -1,0 +1,6 @@
+possible neural networks to consider:
+	- Radial Basis Neural network
+	- Layer Recurrent neural network
+	- FeedForward neural network
+	- Time Delay neural network 
+	- Distributed Delay neural network
