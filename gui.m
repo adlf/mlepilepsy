@@ -7,7 +7,7 @@
 
 function gui
     close all
-    
+    object_to_save = [];
     network_object = [];
     training_target_data = [];
     training_input_data = [];
@@ -15,48 +15,48 @@ function gui
     test_input_data = [];
     
     % Create the GUI window
-    f = figure('Visible','off', 'Resize','off', 'Position',[0,0,600,400]); f.Name = 'Prediction and detection of epileptic seizures';
+    f = figure('Visible','off', 'Resize','off', 'Position',[0,0,600,600]); f.Name = 'Prediction and detection of epileptic seizures';
     movegui(f, 'northwest')
 
-    % Create GUI items
-    left_panel = uipanel('Title','Neural network settings','FontSize',16,'Position',[0.02 0.02 0.45 0.96]);
+    % Create GUI item
+    
+    top_panel = uipanel('Title','Create a neural network','FontSize',16,'Position',[0.02 0.64 0.96 0.35]);
+    left_panel = uipanel('Title','Testing and training','FontSize',16,'Position',[0.02 0.02 0.45 0.61]);
+    right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.61]);
+
+    %select_network_type_text   = uicontrol(top_panel,'Position',[10,150,200,25],'Style','text','String','Select the network architecture','HorizontalAlignment','left');  
+    %select_network_type        = uicontrol(top_panel,'Position',[10,130,200,25],'Style','popupmenu','String',{'Feed-forward','Narx','something'},'HorizontalAlignment','left','Callback',@select_network_callback);
+    
+   
+    
+    
 
     select_network_text       = uicontrol(left_panel,'Position',[10,320,200,25],'Style','text','String','Select the network:','HorizontalAlignment','left');  
     select_network            = uicontrol(left_panel,'Position',[10,300,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_network_callback);
-    
     network_name_text         = uicontrol(left_panel,'Position',[10,280,200,25],'Style','text','String','Name: Network lalalaa','HorizontalAlignment','left');  
-    
     select_training_data_text = uicontrol(left_panel,'Position',[10,250,200,25],'Style','text','String','Select training data:','HorizontalAlignment','left');  
     select_training_data      = uicontrol(left_panel,'Position',[10,230,200,25],'Style','popupmenu', 'String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_training_data_callback);
     train_network_button      = uicontrol(left_panel,'Position',[10,210,75,25],'Style','pushbutton','String','Train network','Callback',@train_network_button_callback);
-
     select_test_data_text     = uicontrol(left_panel,'Position',[10,170,200,25],'Style','text','String','Select test data','HorizontalAlignment','left');  
     select_test_data          = uicontrol(left_panel,'Position',[10,150,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_test_data_callback);
     test_network_button       = uicontrol(left_panel,'Position',[10,130,75,25],'Style','pushbutton','String','Test network','Callback',@test_network_button_callback);
-       
-    error_text                = uicontrol(left_panel,'Position',[10,10,200,100],'ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
+    save_network_button       = uicontrol(left_panel,'Position',[10,90,75,25],'Style','pushbutton','String','Save network','Callback',@save_network_button_callback);
+    error_text                = uicontrol(left_panel,'Position',[10,10,200,80],'ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
 
-    right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.96]);
-    
     specificity_text  = uicontrol(right_panel,'Position',[10,300,200,25],'Style','text','String','Specificity:','HorizontalAlignment','left');  
     specificity_value = uicontrol(right_panel,'Position',[70,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
     sensitivity_text  = uicontrol(right_panel,'Position',[10,280,200,25],'Style','text','String','Sensitivity:','HorizontalAlignment','left');  
     sensitivity_value = uicontrol(right_panel,'Position',[70,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
     f_text            = uicontrol(right_panel,'Position',[10,260,200,25],'Style','text','String','F-value:','HorizontalAlignment','left');  
     f_value           = uicontrol(right_panel,'Position',[70,260,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    
     t_p_text          = uicontrol(right_panel,'Position',[130,300,200,25],'Style','text','String','True positives:','HorizontalAlignment','left');  
     t_p_value         = uicontrol(right_panel,'Position',[220,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    
     t_n_text          = uicontrol(right_panel,'Position',[130,280,200,25],'Style','text','String','True negatives:','HorizontalAlignment','left');  
     t_n_value         = uicontrol(right_panel,'Position',[220,280,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    
     f_p_text          = uicontrol(right_panel,'Position',[130,260,200,25],'Style','text','String','False positives:','HorizontalAlignment','left');  
     f_p_value         = uicontrol(right_panel,'Position',[220,260,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    
     f_n_text          = uicontrol(right_panel,'Position',[130,240,200,25],'Style','text','String','False negatives:','HorizontalAlignment','left');  
     f_n_value         = uicontrol(right_panel,'Position',[220,240,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    
     result_text       = uicontrol(right_panel,'Position',[10,200,200,35],'Style','text','String','Green: True positive, Blue: Not found, Red: False positive','HorizontalAlignment','left');  
     result_plot            = axes(right_panel, 'Units','Pixels','Position',[20,20,230,50],'YLim',[-0.2 1.2]); 
 
@@ -196,7 +196,6 @@ function gui
 
     function test_network_button_callback(source,eventdata)
         disp('Test network');
-        
         try
             result = round(network_object(test_input_data));
             [se, sp, f, t_p, t_n, f_p, f_n, fts, ffs, nfs] = calculate_performance(result, test_target_data);
@@ -218,5 +217,24 @@ function gui
         disp('Network tested');
     end
 
+    function save_network_button_callback(source,eventdata)
+        disp('Save the network data');
+        old_filename = select_network.String{select_network.Value};
+        old_network_name = strsplit(old_filename, '.');
+        old_network_name = char(old_network_name(1));
 
-end 
+        prompt = {'Enter new file name:'};
+        dlg_title = 'Input';
+        num_lines = 1;
+        defaultans = {old_network_name};
+        new_name = inputdlg(prompt,dlg_title,num_lines,defaultans)
+        
+        if isempty(new_name)
+            return;
+        else
+            new_name_str = char(new_name{1});
+            object_to_save.(new_name_str) = network_object;
+            save(strcat(['networks/' new_name_str]), '-struct', 'object_to_save')
+        end
+    end
+end
