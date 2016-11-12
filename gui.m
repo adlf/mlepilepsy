@@ -1,6 +1,6 @@
 % GUI TODO:
 % Clear network weights
-% Edit activation function and training function
+% Edit training function
 
 function gui
     close all
@@ -16,22 +16,23 @@ function gui
     movegui(f, 'northwest')
 
     % Create GUI item
+    left_panel = uipanel('Title','Testing and training','FontSize',16,'Position',[0.02 0.02 0.45 0.98]);
+    right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.98]);
     
-    left_panel = uipanel('Title','Testing and training','FontSize',16,'Position',[0.02 0.02 0.45 0.95]);
-    right_panel = uipanel('Title','Results','FontSize',16,'Position',[0.53 0.02 0.45 0.95]);
+    save_network_button       = uicontrol(left_panel,'Position',[170,345,75,25],'Style','pushbutton','String','Save network','Callback',@save_network_button_callback);
+    create_network_button     = uicontrol(left_panel,'Position',[10,345,75,25],'Style','pushbutton','String','Create network','Callback',@create_network_button_callback);
+    view_network_button       = uicontrol(left_panel,'Position',[90,345,75,25],'Style','pushbutton','String','View network','Callback',@view_network_button_callback);
     
     select_network_text       = uicontrol(left_panel,'Position',[10,320,200,25],'Style','text','String','Select the network:','HorizontalAlignment','left');  
     select_network            = uicontrol(left_panel,'Position',[10,300,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_network_callback);
-    network_name_text         = uicontrol(left_panel,'Position',[10,280,200,25],'Style','text','String','Name: Network lalalaa','HorizontalAlignment','left');  
-    select_training_data_text = uicontrol(left_panel,'Position',[10,250,200,25],'Style','text','String','Select training data:','HorizontalAlignment','left');  
-    select_training_data      = uicontrol(left_panel,'Position',[10,230,200,25],'Style','popupmenu', 'String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_training_data_callback);
-    train_network_button      = uicontrol(left_panel,'Position',[10,210,75,25],'Style','pushbutton','String','Train network','Callback',@train_network_button_callback);
-    select_test_data_text     = uicontrol(left_panel,'Position',[10,170,200,25],'Style','text','String','Select test data','HorizontalAlignment','left');  
-    select_test_data          = uicontrol(left_panel,'Position',[10,150,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_test_data_callback);
-    test_network_button       = uicontrol(left_panel,'Position',[10,130,75,25],'Style','pushbutton','String','Test network','Callback',@test_network_button_callback);
-    save_network_button       = uicontrol(left_panel,'Position',[10,90,75,25],'Style','pushbutton','String','Save network','Callback',@save_network_button_callback);
-    create_network_button     = uicontrol(left_panel,'Position',[100,90,75,25],'Style','pushbutton','String','Create network','Callback',@create_network_button_callback);
-    error_text                = uicontrol(left_panel,'Position',[10,10,200,80],'ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
+    network_name_text         = uicontrol(left_panel,'Position',[10,280,200,25],'Style','text','String','Name:','HorizontalAlignment','left');  
+    select_training_data_text = uicontrol(left_panel,'Position',[10,240,200,25],'Style','text','String','Select training data','HorizontalAlignment','left');  
+    select_training_data      = uicontrol(left_panel,'Position',[10,220,200,25],'Style','popupmenu', 'String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_training_data_callback);
+    train_network_button      = uicontrol(left_panel,'Position',[10,200,75,25],'Style','pushbutton','String','Train network','Callback',@train_network_button_callback);
+    select_test_data_text     = uicontrol(left_panel,'Position',[10,140,200,25],'Style','text','String','Select test data','HorizontalAlignment','left');  
+    select_test_data          = uicontrol(left_panel,'Position',[10,120,200,25],'Style','popupmenu','String',{'', 'NN1','NN2','NN3'},'HorizontalAlignment','left','Callback',@select_test_data_callback);
+    test_network_button       = uicontrol(left_panel,'Position',[10,100,75,25],'Style','pushbutton','String','Test network','Callback',@test_network_button_callback);
+    error_text                = uicontrol(left_panel,'Position',[10,0,100,80],'ForegroundColor', 'red', 'Style','text','String','','HorizontalAlignment','left');
 
     specificity_text  = uicontrol(right_panel,'Position',[10,300,200,25],'Style','text','String','Specificity:','HorizontalAlignment','left');  
     specificity_value = uicontrol(right_panel,'Position',[70,300,200,25],'Style','text','String','','HorizontalAlignment','left');  
@@ -71,7 +72,7 @@ function gui
             path = strcat(['networks/' filename]);
             loaded = load(path);
             network_object = loaded.(network_name);
-            network_name_text.String = ['Name: ' char(network_object.name)];
+            network_name_text.String = ['Description: ' char(network_object.name)];
         catch ME
             print_error(ME);
         end
@@ -79,8 +80,6 @@ function gui
 
     function select_training_data_callback(source,eventdata)
         disp('Select training data');
-        disp(source.String);
-        disp(source.Value);
         try
             filename = source.String{source.Value};
             data_name = strsplit(filename, '.');
@@ -94,6 +93,7 @@ function gui
             input_data_path = strcat(['data/' input_data_name '.mat']);
             loaded = load(input_data_path);
             training_input_data = loaded.(input_data_name);
+            
         catch ME
             print_error(ME);
         end
@@ -171,7 +171,7 @@ function gui
 
     function print_error(exception)
         disp(exception);
-        error_text.String = getReport(exception);
+        %error_text.String = getReport(exception);
     end
 
 %%%% NEURAL NETWORK FUNCTIONS %%%%
@@ -238,5 +238,8 @@ function gui
             object_to_save.(new_name_str) = network_object;
             save(strcat(['networks/' new_name_str]), '-struct', 'object_to_save')
         end
+    end
+    function view_network_button_callback(source,eventdata)
+        view(network_object)
     end
 end
