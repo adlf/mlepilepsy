@@ -62,7 +62,7 @@ for i = 1:length_112502
         count4 = count4 + 1;
     end
 end
-    
+
 prepared_112502.Trg = target_112502;
 
 % 10 seizures to training set and 4 to test set
@@ -140,21 +140,4 @@ save('test_112502_trg_interictal', 'test_112502_trg_interictal');
 save('test_112502_trg_preictal', 'test_112502_trg_preictal');
 save('test_112502_trg_ictal', 'test_112502_trg_ictal');
 save('test_112502_trg_posictal', 'test_112502_trg_posictal');
-    
-test_zero_input = train_112502_input;
-test_zero_input(:,:) = 0;
-
-train_zero_input = train_112502_input;
-train_zero_input(:,:) = 0;
-
-test_zero_trg = train_112502_trg_interictal;
-test_zero_trg(:) = 0;
-
-train_zero_trg = train_112502_trg_interictal;
-train_zero_trg(:) = 0;
-
-save('test_zero_input','test_zero_input');
-save('train_zero_input','train_zero_input');
-save('test_zero_trg','test_zero_trg');
-save('train_zero_trg','train_zero_trg');
     

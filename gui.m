@@ -48,8 +48,8 @@ function gui
     f_p_value         = uicontrol(right_panel,'Position',[220,260,200,25],'Style','text','String','','HorizontalAlignment','left');  
     f_n_text          = uicontrol(right_panel,'Position',[130,240,200,25],'Style','text','String','False negatives:','HorizontalAlignment','left');  
     f_n_value         = uicontrol(right_panel,'Position',[220,240,200,25],'Style','text','String','','HorizontalAlignment','left');  
-    result_text       = uicontrol(right_panel,'Position',[10,200,200,35],'Style','text','String','Green: True positive, Blue: Not found, Red: False positive','HorizontalAlignment','left');  
-    result_plot            = axes(right_panel, 'Units','Pixels','Position',[20,20,230,50],'YLim',[-0.2 1.2]); 
+    result_text       = uicontrol(right_panel,'Position',[10,200,200,35],'Style','text','String','Green: Result, Red: Target','HorizontalAlignment','left');  
+    result_plot       = axes(right_panel, 'Units','Pixels','Position',[20,20,230,150],'YLim',[-0.2 1.2]); 
 
     
     f.Visible = 'on';
@@ -105,7 +105,7 @@ function gui
             filename = source.String{source.Value};
             data_name = strsplit(filename, '.');
             data_name = char(data_name(1));
-            path = strcat(['data/' filename]);
+            path = strcat(['data/' filename])
             loaded = load(path);
             test_target_data = loaded.(data_name);
 
@@ -181,7 +181,7 @@ function gui
         try
             network_object = configure(network_object, training_input_data, training_target_data);
             network_object = init(network_object);
-            network_object = train(network_object, training_input_data, training_target_data);
+            network_object = train(network_object, training_input_data, training_target_data, 'useParallel','yes');
         catch ME
             error_text.String = getReport(ME)
         end
@@ -191,8 +191,17 @@ function gui
     function test_network_button_callback(source,eventdata)
         disp('Test network');
         try
-            result = round(network_object(test_input_data));
-            [se, sp, f, t_p, t_n, f_p, f_n, fts, ffs, nfs] = calculate_performance(result, test_target_data);
+            test_input_data;
+            result = network_object(test_input_data);
+            qu90 = quantile(result, 0.9)
+            qu_result = result - (qu90 - 0.5);
+            round_result = round(qu_result);
+            
+            if max(test_target_data) ~= 1 || min(test_target_data) ~= 0
+                disp('Something wrong with target data');
+            end
+            
+            [se, sp, f, t_p, t_n, f_p, f_n, fts, ffs, nfs] = calculate_performance(round_result, test_target_data);
             specificity_value.String = sp;
             sensitivity_value.String = se;
             f_value.String = f;
@@ -202,9 +211,8 @@ function gui
             f_n_value.String = f_n;
             cla
             hold on
-            plot(fts,'g');
-            plot(ffs,'r');
-            plot(nfs,'b');
+            plot(result,'g');
+            plot(test_target_data,'r');
         catch ME
             print_error(ME);
         end

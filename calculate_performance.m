@@ -18,11 +18,11 @@ function [ sensitivity, specificity, F, true_positives, true_negatives, false_po
             true_negatives = true_negatives + 1;
         end
         
-        if inp ~= trg && trg == 1
+        if inp ~= trg && trg == 0
             false_positives = false_positives + 1;
         end
         
-        if inp ~= trg && trg == 0
+        if inp ~= trg && trg == 1
             false_negatives = false_negatives + 1;
         end
     end
