@@ -193,9 +193,9 @@ function gui
         try
             test_input_data;
             result = network_object(test_input_data);
-            qu90 = quantile(result, 0.9)
-            qu_result = result - (qu90 - 0.5);
-            round_result = round(qu_result);
+            %qu90 = quantile(result, 0.9)
+            %qu_result = result - (qu90 - 0.5);
+            round_result = round(result);
             
             if max(test_target_data) ~= 1 || min(test_target_data) ~= 0
                 disp('Something wrong with target data');
