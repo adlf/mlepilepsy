@@ -126,10 +126,9 @@ function [net, name] = create_network(a,b)
             net.layers{i}.transferFcn = fcn
         end
         net.name = char(select_description.String);
-        net.divideParam.trainRatio = 0.7;
-        net.divideParam.valRatio = 0.15;
-        net.divideParam.testRatio = 0.15;
-        net.trainParam.min_grad = 1e-20;
+        net.divideParam.trainRatio = 1;
+        net.divideParam.valRatio = 0;
+        net.divideParam.testRatio = 0;
         view(net);
     end
 

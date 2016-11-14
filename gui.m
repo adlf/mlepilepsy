@@ -179,6 +179,8 @@ function gui
     function train_network_button_callback(source,eventdata)        
         disp('Train network');
         try
+            network_object = configure(network_object, training_input_data, training_target_data);
+            network_object = init(network_object);
             network_object = train(network_object, training_input_data, training_target_data);
         catch ME
             error_text.String = getReport(ME)
