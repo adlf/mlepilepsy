@@ -181,7 +181,7 @@ function gui
         try
             network_object = configure(network_object, training_input_data, training_target_data);
             network_object = init(network_object);
-            network_object = train(network_object, training_input_data, training_target_data, 'useParallel','yes');
+            network_object = train(network_object, training_input_data, training_target_data);
         catch ME
             error_text.String = getReport(ME)
         end
