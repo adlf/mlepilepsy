@@ -90,26 +90,24 @@ test_54802.FeatVectSel = prepared_54802.FeatVectSel(:,threshold:length_54802);
 equip = [];
 equip.Trg = zeros(4,1);
 equip.FeatVectSel = zeros(29,1);
-goal = 102516; % 2x amount of ictal columns
-threshold = 0.8509;
+threshold = 0.1491; % 1 - 85.09%
+val = 0;
 count = 1;
 
-while abs(goal - count) > 20
-    count = 1;
-    for i = 1:length(train_54802.Trg)
-        if train_54802.Trg(:,i) == [1;0;0;0]
-            if rand() >= threshold
-                equip.Trg(:,count) = train_54802.Trg(:,i);
-                equip.FeatVectSel(:,count) = train_54802.FeatVectSel(:,i);
-                count = count + 1;
-            end
-        else
+for i = 1:length(train_54802.Trg)
+    if train_54802.Trg(:,i) == [1;0;0;0]
+        val = val + 0.1491;
+        if val >= 1
+            val = val - 1;
             equip.Trg(:,count) = train_54802.Trg(:,i);
             equip.FeatVectSel(:,count) = train_54802.FeatVectSel(:,i);
             count = count + 1;
         end
+    else
+        equip.Trg(:,count) = train_54802.Trg(:,i);
+        equip.FeatVectSel(:,count) = train_54802.FeatVectSel(:,i);
+        count = count + 1;
     end
-    goal - count   
 end
 
 train_54802 = equip
@@ -140,6 +138,3 @@ save('test_54802_trg_interictal', 'test_54802_trg_interictal');
 save('test_54802_trg_preictal', 'test_54802_trg_preictal');
 save('test_54802_trg_ictal', 'test_54802_trg_ictal');
 save('test_54802_trg_posictal', 'test_54802_trg_posictal');
-    
-    
-    

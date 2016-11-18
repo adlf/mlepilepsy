@@ -90,26 +90,24 @@ test_112502.FeatVectSel = prepared_112502.FeatVectSel(:,threshold:length_112502)
 equip = [];
 equip.Trg = zeros(4,1);
 equip.FeatVectSel = zeros(29,1);
-goal = 20598; % 2x amount of ictal columns
 threshold = 0.9263;
+val = 0;
 count = 1;
 
-while abs(goal - count) > 20
-    count = 1;
-    for i = 1:length(train_112502.Trg)
-        if train_112502.Trg(:,i) == [1;0;0;0]
-            if rand() >= threshold
-                equip.Trg(:,count) = train_112502.Trg(:,i);
-                equip.FeatVectSel(:,count) = train_112502.FeatVectSel(:,i);
-                count = count + 1;
-            end
-        else
+for i = 1:length(train_112502.Trg)
+    if train_112502.Trg(:,i) == [1;0;0;0]
+        val = val + 0.1491;
+        if val >= 1
+            val = val - 1;
             equip.Trg(:,count) = train_112502.Trg(:,i);
             equip.FeatVectSel(:,count) = train_112502.FeatVectSel(:,i);
             count = count + 1;
-       end
+        end
+    else
+        equip.Trg(:,count) = train_112502.Trg(:,i);
+        equip.FeatVectSel(:,count) = train_112502.FeatVectSel(:,i);
+        count = count + 1;
     end
-    goal - count   
 end
 
 train_112502 = equip
