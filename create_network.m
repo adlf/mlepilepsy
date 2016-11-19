@@ -1,18 +1,22 @@
 function [net, name] = create_network(a,b)
-	%- FeedForward neural network
-	%- Distributed Delay neural network
-	%- Time Delay neural network 
-	%--- Layer Recurrent neural network
-	%--- Radial Basis Neural network
+	% a function for creating neural networks. Can be used for following
+	% architectures:
+    % -Feedforward neural network
+	% -Distributed Delay neural network
+	% -Time delay neural network 
+	% -Layer recurrent neural network
 
-    f = figure('Visible','off', 'Resize','off', 'Position',[0,0,300,400]); f.Name = 'Create a new network';
+    % Create the figure
+    f = figure('Visible','off', 'Resize','off', 'Position',[0,0,300,400]);
+    f.Name = 'Create a new network';
     movegui(f, 'northwest')
     f.Visible = 'on';
     
     network = [];
     
+    % Create common uicontrols. Other uicontrols are added in
+    % select_network_callback depending on the selected network architecture
     left_panel = uipanel('Title','Create a network','FontSize',16,'Position',[0.02 0.02 0.95 0.95]);
-    
     select_name_text          = uicontrol(left_panel,'Position',[10,320,200,25],'Style','text','String','Select the network name:','HorizontalAlignment','left');  
     select_name               = uicontrol(left_panel,'Position',[10,300,200,25],'Style','edit','HorizontalAlignment','left');
     select_description_text   = uicontrol(left_panel,'Position',[10,280,200,25],'Style','text','String','Description for the network:','HorizontalAlignment','left');  
@@ -22,10 +26,12 @@ function [net, name] = create_network(a,b)
         {'FeedForward neural network','Distributed Delay neural','Time Delay neural network', 'Layer Recurrent neural network'},...
         'HorizontalAlignment','left','Callback',@select_network_callback);
     save_network_button       = uicontrol(left_panel,'Position',[160,10,100,25],'Style','pushbutton','String','Save & Close','Callback',@save_network);
-
-    ui_controls = {};
     select_network_callback(select_type);
     
+    ui_controls = {};
+
+    % Callback function for selecting the network architecture
+    % Draws the architecture-specific uicontrols
     function select_network_callback(source, eventdata)
         value = source.Value
         switch value
@@ -78,6 +84,7 @@ function [net, name] = create_network(a,b)
         end
     end
 
+    % Function for creating feedforward networks
     function create_feedforward(source, eventdata)
         disp('Create feedforward');
         neurons = eval(ui_controls{2}.String)
@@ -87,6 +94,7 @@ function [net, name] = create_network(a,b)
         net = common_settings(net);
     end
 
+    % Function for creating distributed delay networks
     function create_distdelay(source, eventdata)
         disp('Create distdelay');
         neurons = eval(ui_controls{2}.String)
@@ -97,6 +105,7 @@ function [net, name] = create_network(a,b)
         net = common_settings(net);
     end
 
+    % Function for creating time delay networks
     function create_timedelay(source, eventdata)
         disp('Create timedelau');
         neurons = eval(ui_controls{2}.String)
@@ -107,6 +116,7 @@ function [net, name] = create_network(a,b)
         net = common_settings(net);
     end
 
+    % Function for creating layer recurrent networks
     function create_layrecnet(source, eventdata)
         disp('Create layrecnet');
         neurons = str2num(ui_controls{2}.String)
@@ -117,6 +127,7 @@ function [net, name] = create_network(a,b)
         net = common_settings(net);
     end
     
+    % Function for setting the common neural networks settings
     function net = common_settings(net)
         transferFcn = eval(ui_controls{8}.String)
         for i = 1:length(transferFcn)
@@ -132,6 +143,7 @@ function [net, name] = create_network(a,b)
         view(net);
     end
 
+    % Function to clear architecture-specific uicontrols
     function clear_ui()
         disp('Clearing ui');
         for i = 1:length(ui_controls)
@@ -141,6 +153,7 @@ function [net, name] = create_network(a,b)
         ui_controls = {};
     end
 
+    % Function for returning the created network and closing the window
     function save_network(source, eventdata)
         netname = char(select_name.String);
         name = netname;
@@ -148,6 +161,7 @@ function [net, name] = create_network(a,b)
         delete(f);
     end
 
+    % Used to block the program execution
     uiwait(gcf);
 end
 

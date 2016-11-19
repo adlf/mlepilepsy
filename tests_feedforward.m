@@ -22,7 +22,7 @@ hold on;
 disp('Starting feedforwardnet ictal test with patient 112502');
 %for d = 1:5
     for i = 1:5
-        layers = [i*20];
+        layers = [i*20, i*20];
         disp(strcat(['112502 ictal i: ', num2str(i)]))
         [se,sp,f,o_se,o_sp,o_f,threshold, name] = test_feedforward(layers, tr_i, tr_t, te_i, te_t,test_name, iterations);
         results.(name) = {}; 
@@ -67,7 +67,7 @@ hold on;
 disp('Starting feedforwardnet ictal test with patient 54802');
 %for d = 1:5
     for i = 1:5
-        layers = [i*20];
+        layers = [i*20, i*20];
         disp(strcat(['54802 ictal i: ', num2str(i)]))
         [se,sp,f,o_se,o_sp,o_f,threshold, name] = test_feedforward(layers, tr_i, tr_t, te_i, te_t,test_name, iterations);
         results.(name) = {}; 
@@ -115,7 +115,7 @@ hold on;
 disp('Starting feedforwardnet preictal test with patient 112502');
 %for d = 1:5
     for i = 1:5
-        layers = [i*20];
+        layers = [i*20, i*20];
         disp(strcat(['112502 preictal i: ', num2str(i)]))
         [se,sp,f,o_se,o_sp,o_f,threshold, name] = test_feedforward(layers, tr_i, tr_t, te_i, te_t,test_name, iterations);
         results.(name) = {}; 
@@ -160,7 +160,7 @@ hold on;
 disp('Starting feedforwardnet preictal test with patient 54802');
 %for d = 1:5
     for i = 1:5
-        layers = [i*20];
+        layers = [i*20, i*20];
         disp(strcat(['54802 preictal i: ', num2str(i)]))
         [se,sp,f,o_se,o_sp,o_f,threshold, name] = test_feedforward(layers, tr_i, tr_t, te_i, te_t,test_name, iterations);
         results.(name) = {}; 

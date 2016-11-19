@@ -1,11 +1,13 @@
+% Script for preparing the data in 54802.mat to use with neural networks
+
+% Load data
 prepared_54802  = load('54802.mat');
 prepared_54802.FeatVectSel = transpose(prepared_54802.FeatVectSel);
 prepared_54802.Trg = transpose(prepared_54802.Trg);
 length_54802 = length(prepared_54802.FeatVectSel);
 target_54802 = zeros(4,length_54802);
-seizureCount = 0;
 
-% Change 1:s to 3:s
+% Change ones to threes
 for i = 1:length_54802
     if prepared_54802.Trg(i) == 1
         prepared_54802.Trg(i) = 3;
@@ -14,14 +16,13 @@ for i = 1:length_54802
     end
 end
 
-% Find pre-ictal and post-ictal states
+% Find preictal and posictal states
 state = 0;
 for i = 1:length_54802
     trg = prepared_54802.Trg(i);
     
     % change 600 values to 2 before every seizure
     if state == 0 && trg == 3
-        seizureCount = seizureCount + 1;
         state = 1;
         for j = (i-600):(i-1)
             prepared_54802.Trg(j) = 2;
@@ -39,33 +40,24 @@ for i = 1:length_54802
     end    
 end
 
-count1 = 0;
-count2 = 0;
-count3 = 0;
-count4 = 0;
-
 % Create target matrix and calculate amounts of different values
 for i = 1:length_54802
     trg = prepared_54802.Trg(i);
     switch trg
     case 1
         target_54802(:,i) = [1;0;0;0];
-        count1 = count1 + 1;
     case 2
         target_54802(:,i) = [0;1;0;0];
-        count2 = count2 + 1;
     case 3
         target_54802(:,i) = [0;0;1;0];
-        count3 = count3 + 1;
     case 4
         target_54802(:,i) = [0;0;0;1];
-        count4 = count4 + 1;
     end
 end
     
 prepared_54802.Trg = target_54802;
 
-% 21 seizures to training set and 10 to test set
+% Divide 21 seizures to training set and 10 to test set.
 threshold = 395000;
 
 train_54802 = prepared_54802;
@@ -75,6 +67,7 @@ train_54802.FeatVectSel = prepared_54802.FeatVectSel(:,1:threshold);
 test_54802.Trg = prepared_54802.Trg(:,threshold:length_54802);
 test_54802.FeatVectSel = prepared_54802.FeatVectSel(:,threshold:length_54802);
 
+% From the introduction.pdf:
 % Equilibrate the number
 % of points of the several classes in the training set,
 % but not in the testing set. This is the class balancing approach.

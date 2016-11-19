@@ -1,8 +1,9 @@
-% GUI TODO:
-% Edit training function
+% Application GUI for creating, training and testing neural networks
 
 function gui
     close all
+    
+    % Create used global variables
     object_to_save = [];
     network_object = [];
     training_target_data = [];
@@ -14,7 +15,7 @@ function gui
     f = figure('Visible','off', 'Resize','off', 'Position',[0,0,300,450]); f.Name = 'Prediction and detection of epileptic seizures';
     movegui(f, 'northwest')
 
-    % Create GUI item
+    % Create uicontrols
     left_panel = uipanel('Title','Testing and training','FontSize',16,'Position',[0.02 0.02 0.95 0.98]);
     
     save_network_button       = uicontrol(left_panel,'Position',[170,390,75,25],'Style','pushbutton','String','Save network','Callback',@save_network_button_callback);
@@ -58,7 +59,6 @@ function gui
     select_training_data_callback(select_training_data);
     select_test_data_callback(select_test_data);
     
-
     %%%% GUI CALLBACKS %%%%
 
     function select_network_callback(source,eventdata)
@@ -113,7 +113,6 @@ function gui
             names{k} = file;
         end
         select_training_data.String = names;
-
     end
     
     function get_test_data_list()
@@ -125,7 +124,6 @@ function gui
             names{k} = file;
         end
         select_test_data.String = names;
-
     end
 
     function get_network_list()
@@ -184,11 +182,6 @@ function gui
         f_p_value.String = f_p;
         f_n_value.String = f_n;
 
-        %figure
-        %plot(round_result,'g');
-        %hold on;
-        %plot(test_target_data,'r');
-
         disp('Network tested');
     end
 
@@ -222,6 +215,7 @@ function gui
             save(strcat(['networks/' new_name_str]), '-struct', 'object_to_save')
         end
     end
+
     function view_network_button_callback(source,eventdata)
         view(network_object)
     end

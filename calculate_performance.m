@@ -1,4 +1,7 @@
+
 function [ sensitivity, specificity, F, true_positives, true_negatives, false_positives, false_negatives] = calculate_performance( input, target )
+    % a function for calculating the sensitivity, specificity and f-score from
+    % input and target values 
     
     % True positive: Seizures correctly identified as seizures
     % False positive: interictal states incorrectly identified as seizures
